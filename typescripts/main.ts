@@ -1,5 +1,34 @@
 window.onload = function(){
     initBuyButtons();
+    displayNumberOfItems();
+
+    let cartIcon = <HTMLElement>document.querySelector("#shopping-cart");
+    cartIcon.onclick = showCartContents;
+}
+
+function showCartContents(){
+    let displayDiv = document.querySelector("#display-cart");
+    displayDiv.innerHTML = "";
+
+    let allProds = ProductStorage.getAllProducts();
+
+    for(let i = 0; i < allProds.length; i++){
+        const prod = allProds[i];
+
+        /*
+            <div class="display-product">
+                <h2>Widget - $80.00</h2>
+                <p>Widgets are really cool...</p>
+            <div>
+        */
+
+        let prodDiv = document.createElement("div");
+        prodDiv.classList.add("display-product");
+        let h2 = document.createElement("h2");
+        h2.innerHTML = prod.title + " - $" + prod.price;
+        prodDiv.appendChild(h2);
+        displayDiv.appendChild(prodDiv);
+    }
 }
 
 /**
@@ -14,16 +43,24 @@ function initBuyButtons() {
 }
 
 function buyProduct(){
-    let prod = getProduct();
+    let currBtn = this; // The "Buy" button that was clicked
+    let prod = getProduct(currBtn);
 
     saveProductToCart(prod);
+
+    displayNumberOfItems();
+}
+
+function displayNumberOfItems(){
+    let numItems = ProductStorage.getNumberOfProducts();
+    let cartSpan = document.querySelector("div#shopping-cart > span");
+    cartSpan.innerHTML = numItems.toString();
 }
 
 /**
  * Get the Product object for the currently selected product.
  */
-function getProduct() {
-    let currBuyBtn = <HTMLElement>this;
+function getProduct(currBuyBtn:HTMLElement) {
     console.log("The buy button that was clicked");
     console.log(currBuyBtn);
 
@@ -48,5 +85,6 @@ function getProduct() {
 }
 
 function saveProductToCart(p:Product):Product[]{
-    
+    ProductStorage.addProduct(p);
+    return ProductStorage.getAllProducts();
 }
